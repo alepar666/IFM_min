@@ -1,0 +1,66 @@
+h1 {
+    display: flex;
+    justify-content: center;
+}
+
+h2 {
+    display: flex;
+    justify-content: center;
+}
+
+h5 {
+    display: table;
+    margin: 0 auto;
+}
+
+.container {
+    display: table;
+    margin: 0 auto;
+    border: 1px solid black;
+}
+
+body {
+    color: white;
+    background-color: black;
+    font-family: monospace, monospace;
+    font-size: 1em;
+
+}
+
+#cbs {
+    color: white;
+    border-color: red;
+    border-radius: 4px;
+    background-color: black;
+    font-family: monospace, monospace;
+}
+
+#df {
+    color: white;
+    border-color: yellow;
+    border-radius: 4px;
+    background-color: black;
+    font-family: monospace, monospace;
+}
+
+#tdm {
+    color: white;
+    border-color: cornflowerblue;
+    border-radius: 4px;
+    background-color: black;
+    font-family: monospace, monospace;
+}
+
+.ongoing {
+    color: red;
+    font-weight: bold;
+}
+
+table {
+    display: table;
+    margin: 0 auto;
+    width: 50%;
+    height: 20%;
+    border: 0px solid;
+    text-align: left;
+}
