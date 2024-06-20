@@ -24,7 +24,10 @@ body {
     background-color: black;
     font-family: monospace, monospace;
     font-size: 1em;
+}
 
+#loading {
+    font-size: 1em;
 }
 
 #cbs {
@@ -58,8 +61,7 @@ body {
 
 table {
     display: table;
-    margin: 0 auto;
-    width: 50%;
+    margin: auto;
     height: 20%;
     border: 0px solid;
     text-align: left;
