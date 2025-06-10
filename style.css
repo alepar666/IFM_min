@@ -60,6 +60,7 @@ body {
 }
 
 table {
+    table-layout: fixed;
     display: table;
     margin: auto;
     height: 20%;
