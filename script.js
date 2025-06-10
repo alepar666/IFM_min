@@ -53,10 +53,7 @@ function playChannel(channelNumber) {
     feedHTML(LOADING_DIV_ID, LOADING_MSG);
     var source = document.getElementById(AUDIO_PLAYER_SOURCE_ID);
     var channelElement = document.getElementById(channelsId[channelNumber - 1]);
-    //source.src = channelElement.getAttribute(CHANNEL_DATA_VALUE_KEY);
 
-    // audio.load();
-    // audio.play();
     this.howlerPlayer = new Howl({
         src: ['https://radio.intergalactic.fm/' + channelNumber],
         html5: true,
@@ -71,30 +68,6 @@ function playChannel(channelNumber) {
     document.getElementById(channelNumber + ONGOING).classList.add(ONGOING);
     getNowPlaying(currentNowPlayingUrl);
 }
-
-/*
-// when the audio player has finished loading and is ready to play
-audio.addEventListener(AUDIO_EVENT_PLAYING_NAME, function () {
-    feedHTML(LOADING_DIV_ID, EMPTY_VAL);
-    audio.controls = AUDIO_CONTROLS_KEY;
-    getNowPlaying(currentNowPlayingUrl);
-});
-
-// when there is an error
-audio.addEventListener(AUDIO_EVENT_ERROR_NAME, function (e) {
-    clearTimeout(nowPlayingRequestTimer);
-    var errorCode = e.currentTarget.error.code;
-    reset();
-    manageError(errorCode, EMPTY_VAL);
-});
-
-// action performed on pause button click
-audio.addEventListener(AUDIO_EVENT_PAUSE_NAME, function (e) {
-    audio.currentTime = 0;
-    reset();
-});
-
-*/
 
 // request now playing from IFM server every NOW_PLAYING_REQUEST_TIMEOUT_MSEC
 var previousTrackTitle = EMPTY_VAL;
@@ -151,7 +124,6 @@ function reset() {
     }
 
     clearTimeout(nowPlayingRequestTimer);
-    //audio.controls = EMPTY_VAL;
     removeOngoingMarker();
     removeWebConnectorDependencies();
     feedHTML(NOW_PLAYING_DIV_ID, EMPTY_VAL);
@@ -212,15 +184,13 @@ async function extractCoverFromChannelContent() {
 https://github.com/web-scrobbler/web-scrobbler/blob/master/src/connectors/intergalacticfm.ts#L8
 */
 function removeWebConnectorDependencies() {
-    //audio.classList.remove(VJS_PLAY_CONTROL_CLASS);
-    //audio.classList.remove(VJS_PLAYING_CLASS);
-    document.getElementById(TRACK_META_DIV_ID).classList.remove(TRACK_META_CLASS);
+    document.getElementById(TRACK_META_DIV_ID).classList.remove(VJS_PLAY_CONTROL_CLASS);
+    document.getElementById(TRACK_META_DIV_ID).classList.remove(VJS_PLAYING_CLASS);
 }
 
 function addWebConnectorDependencies() {
-    //audio.classList.add(VJS_PLAY_CONTROL_CLASS);
-    //audio.classList.add(VJS_PLAYING_CLASS);
-    document.getElementById(TRACK_META_DIV_ID).classList.add(TRACK_META_CLASS);
+    document.getElementById(TRACK_META_DIV_ID).classList.add(VJS_PLAY_CONTROL_CLASS);
+    document.getElementById(TRACK_META_DIV_ID).classList.add(VJS_PLAYING_CLASS);
 }
 
 function feedHTML(elementId, value) {
