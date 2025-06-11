@@ -2,7 +2,6 @@ const audio = document.getElementById('player');
 const NOW_PLAYING_REQUEST_TIMEOUT_MSEC = 5000;
 const NOW_PLAYING_REQUEST_PREFIX = 'https://www.intergalactic.fm/now-playing?channel=';
 const NOW_PLAYING_PICTURE_REQUEST_PREFIX = 'https://www.intergalactic.fm/channel-content/';
-const NOW_PLAYING_PICTURE_DEFAULT = 'https://www.intergalactic.fm/sites/default/files/covers/blanco.png';
 const NOW_PLAYING_DIV_ID = 'nowPlaying';
 const TRACK_META_DIV_ID = 'track-meta';
 const NOW_PLAYING_DIV_EXT_ID = 'nowPlayingExt';
@@ -178,7 +177,6 @@ function manageError(code, message) {
 }
 
 async function extractCoverFromChannelContent() {
-    var extractedCoverUrl = NOW_PLAYING_PICTURE_DEFAULT;
     var response = await fetch(NOW_PLAYING_PICTURE_REQUEST_PREFIX + selectedChannel);
     var body = await response.text();
     var startOfCoverImgIndex = body.indexOf('<img');
