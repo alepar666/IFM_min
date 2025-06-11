@@ -66,7 +66,7 @@ function playChannel(channelNumber) {
     channelContentUrl = NOW_PLAYING_PICTURE_REQUEST_PREFIX + channelNumber;
     selectedChannel = channelNumber;
     document.getElementById(channelNumber + ONGOING).classList.add(ONGOING);
-    getNowPlaying(currentNowPlayingUrl);
+    getNowPlaying();
 }
 
 // request now playing from IFM server every NOW_PLAYING_REQUEST_TIMEOUT_MSEC

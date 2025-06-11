@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="user-scalable=no">
+    <title>Howler.js Radio</title>
+    <link rel="stylesheet" href="./styles.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <h1><img src="https://intergalactic.fm/themes/custom/ifm/logo.svg" alt="IFM logo"></h1>
+    <h2>INTERGALACTIC FM</h2>
+
+    <!-- Stations -->
+    <div class="padding"></div>
+    <table>
+        <tr>
+            <td>
+                <div id="live0" class="live">
+                    <div class="circle pulse red"></div>
+                </div>
+            </td>
+            <td>
+                <div id="station0" class="station">
+                    <button id="cbs" class="title">
+                        <div id="title0" class="subtitle"></div>
+                    </button>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div id="live1" class="live">
+                    <div class="circle pulse red"></div>
+                </div>
+            </td>
+            <td>
+                <div id="station1" class="station">
+                    <button id="df" class="title">
+                        <div id="title1" class="subtitle"></div>
+                    </button>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div id="live2" class="live">
+                    <div class="circle pulse red"></div>
+                </div>
+            </td>
+            <td>
+                <div id="station2" class="station">
+                    <button id="tdm" class="title">
+                        <div id="title2" class="subtitle"></div>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <!-- Now Playing -->
+    <div id="track-meta">
+        <h5 id="nowPlaying"> </h5>
+    </div>
+    <br>
+    <table>
+        <tr>
+            <th>
+                <div id="nowPlayingCover"></div>
+            </th>
+            <th>
+                <h6 id="nowPlayingExt"></h6>
+            </th>
+        </tr>
+    </table>
+    <!-- Scripts -->
+    <script src="./howler.core.js"></script>
+    <script src="./radio.js"></script>
+</body>
+
+</html>
