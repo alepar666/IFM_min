@@ -56,7 +56,22 @@ var Radio = function (stations) {
             }
         }.bind(self, i));
     }
+
+    // stop button
+    window['stopButton'].addEventListener("click", function () {
+        if (radio) {
+            radio.stop()
+        }
+    });
+
+    // volume control 
+    let volume = document.getElementById('volume-slider');
+    volume.addEventListener("change", function (e) {
+        var newVolume = e.currentTarget.value / 100;
+        radio.changeVolume(newVolume);
+    });
 };
+
 Radio.prototype = {
     /**
      * Play a station with a specific index.
@@ -77,12 +92,14 @@ Radio.prototype = {
             sound = data.howl = new Howl({
                 src: data.src,
                 html5: true, // A live stream can only be played through HTML5 Audio.
-                format: ['mp3', 'aac']
+                format: ['mp3', 'aac'],
+                volume: 1
             });
         }
 
         // Begin playing the sound.
         sound.play();
+        window['audio_player'].style.visibility = 'visible';
 
         // Toggle the display.
         self.toggleStationDisplay(index, true);
@@ -109,6 +126,7 @@ Radio.prototype = {
         // Stop the sound.
         if (sound) {
             sound.unload();
+            window['audio_player'].style.visibility = 'hidden';
         }
         feedHTML(NOW_PLAYING_DIV_ID, EMPTY_VAL);
         feedHTML(NOW_PLAYING_DIV_EXT_ID, EMPTY_VAL);
@@ -134,6 +152,12 @@ Radio.prototype = {
             window['live' + index].classList.remove('.pulse');
             window['live' + index].style.opacity = 0;
         }
+    },
+
+    changeVolume: function (volumeAmount) {
+        var self = this;
+        var sound = self.stations[self.index].howl;
+        sound.volume(volumeAmount);
     }
 };
 
