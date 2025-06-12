@@ -2,10 +2,13 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="user-scalable=no">
-    <title>Howler.js Radio</title>
-    <link rel="stylesheet" href="./styles.css">
+    <title>No Station Such Dedication</title>
+    <link rel="stylesheet" type="text/css" href="./styles.css">
+    <link rel="stylesheet" type="text/css" href="./audioplayer.css">
+
+    <link rel="icon" type="image/x-icon" href="https://intergalactic.fm/themes/custom/ifm/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
 </head>
 
 <body>
@@ -14,52 +17,28 @@
     <h2>INTERGALACTIC FM</h2>
 
     <!-- Stations -->
-    <div class="padding"></div>
-    <table>
-        <tr>
-            <td>
-                <div id="live0" class="live">
-                    <div class="circle pulse red"></div>
-                </div>
-            </td>
-            <td>
-                <div id="station0" class="station">
-                    <button id="cbs" class="title">
-                        <div id="title0" class="subtitle"></div>
-                    </button>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <div id="live1" class="live">
-                    <div class="circle pulse red"></div>
-                </div>
-            </td>
-            <td>
-                <div id="station1" class="station">
-                    <button id="df" class="title">
-                        <div id="title1" class="subtitle"></div>
-                    </button>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <div id="live2" class="live">
-                    <div class="circle pulse red"></div>
-                </div>
-            </td>
-            <td>
-                <div id="station2" class="station">
-                    <button id="tdm" class="title">
-                        <div id="title2" class="subtitle"></div>
-                    </button>
-                </div>
-            </td>
-        </tr>
-    </table>
-    <br>
+    <div class="container">
+        <span id="live0" class="live circle pulse red">&nbsp;&nbsp;</span>
+        <button id="title0" class="title">
+        </button>
+        <br><br>
+        <span id="live1" class="live circle pulse red">&nbsp;&nbsp;</span>
+        <button id="title1">
+        </button>
+        <br><br>
+        <span id="live2" class="live circle pulse red">&nbsp;&nbsp;</span>
+        <button id="title2">
+        </button>
+        <br><br>
+        <!-- Audio player with commands -->
+        <div id="audio_player">
+            <button id="stopButton">STOP</button> <input class="styled-slider" type="range" id="volume-slider">
+        </div>
+    </div>
+    <br><br>
+
+
+
     <!-- Now Playing -->
     <div id="track-meta">
         <h5 id="nowPlaying"> </h5>

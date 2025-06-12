@@ -9,20 +9,18 @@
  */
 
 // Cache references to DOM elements.
-var elms = ['station0', 'title0', 'live0', 'station1', 'title1', 'live1', 'station2', 'title2', 'live2'];
+var elms = ['title0', 'title1', 'title2'];
 var currentNowPlayingUrl;
 var nowPlayingRequestTimer;
 var selectedChannel;
 const NOW_PLAYING_REQUEST_TIMEOUT_MSEC = 5000;
 const NOW_PLAYING_REQUEST_PREFIX = 'https://www.intergalactic.fm/now-playing?channel=';
 const NOW_PLAYING_PICTURE_REQUEST_PREFIX = 'https://www.intergalactic.fm/channel-content/';
-const NOW_PLAYING_PICTURE_DEFAULT = 'https://www.intergalactic.fm/sites/default/files/covers/blanco.png';
 const NOW_PLAYING_DIV_ID = 'nowPlaying';
 const TRACK_META_DIV_ID = 'track-meta';
 const NOW_PLAYING_DIV_EXT_ID = 'nowPlayingExt';
 const NOW_PLAYING_COVER_DIV_ID = 'nowPlayingCover';
 const EMPTY_VAL = '';
-const stationsTitles = ['Cybernetic Broadcasting System', 'Disco Fetish', 'The Dream Machine'];
 const META_TAGS_SPLIT_CHAR = '|';
 const LINE_BREAK = '<br>';
 const VJS_PLAY_CONTROL_CLASS = 'vjs-play-control';
@@ -45,8 +43,8 @@ var Radio = function (stations) {
 
     // Setup the display for each station.
     for (var i = 0; i < self.stations.length; i++) {
-        window['title' + i].innerHTML = '<b>' + self.stations[i].title;
-        window['station' + i].addEventListener('click', function (index) {
+        window['title' + i].innerHTML = self.stations[i].title;
+        window['title' + i].addEventListener('click', function (index) {
             var isNotPlaying = (self.stations[index].howl && !self.stations[index].howl.playing());
 
             // Stop other sounds or the current one.
@@ -58,7 +56,22 @@ var Radio = function (stations) {
             }
         }.bind(self, i));
     }
+
+    // stop button
+    window['stopButton'].addEventListener("click", function () {
+        if (radio) {
+            radio.stop()
+        }
+    });
+
+    // volume control 
+    let volume = document.getElementById('volume-slider');
+    volume.addEventListener("change", function (e) {
+        var newVolume = e.currentTarget.value / 100;
+        radio.changeVolume(newVolume);
+    });
 };
+
 Radio.prototype = {
     /**
      * Play a station with a specific index.
@@ -79,12 +92,14 @@ Radio.prototype = {
             sound = data.howl = new Howl({
                 src: data.src,
                 html5: true, // A live stream can only be played through HTML5 Audio.
-                format: ['mp3', 'aac']
+                format: ['mp3', 'aac'],
+                volume: 1
             });
         }
 
         // Begin playing the sound.
         sound.play();
+        window['audio_player'].style.visibility = 'visible';
 
         // Toggle the display.
         self.toggleStationDisplay(index, true);
@@ -92,7 +107,7 @@ Radio.prototype = {
         // Keep track of the index we are currently playing.
         self.index = index;
         selectedChannel = index + 1;
-        currentNowPlayingUrl = NOW_PLAYING_REQUEST_PREFIX + stationsTitles[self.index];
+        currentNowPlayingUrl = NOW_PLAYING_REQUEST_PREFIX + self.stations[index].title;
         getNowPlaying();
     },
 
@@ -111,6 +126,7 @@ Radio.prototype = {
         // Stop the sound.
         if (sound) {
             sound.unload();
+            window['audio_player'].style.visibility = 'hidden';
         }
         feedHTML(NOW_PLAYING_DIV_ID, EMPTY_VAL);
         feedHTML(NOW_PLAYING_DIV_EXT_ID, EMPTY_VAL);
@@ -129,7 +145,19 @@ Radio.prototype = {
     toggleStationDisplay: function (index, state) {
         var self = this;
         // Show/hide the "live" marker.
-        window['live' + index].style.opacity = state ? 1 : 0;
+        if (state) {
+            window['live' + index].classList.add('.pulse');
+            window['live' + index].style.opacity = 1;
+        } else {
+            window['live' + index].classList.remove('.pulse');
+            window['live' + index].style.opacity = 0;
+        }
+    },
+
+    changeVolume: function (volumeAmount) {
+        var self = this;
+        var sound = self.stations[self.index].howl;
+        sound.volume(volumeAmount);
     }
 };
 
@@ -200,7 +228,6 @@ function feedNowPlaying(value) {
 }
 
 async function extractCoverFromChannelContent() {
-    var extractedCoverUrl = NOW_PLAYING_PICTURE_DEFAULT;
     var response = await fetch(NOW_PLAYING_PICTURE_REQUEST_PREFIX + selectedChannel);
     var body = await response.text();
     var startOfCoverImgIndex = body.indexOf('<img');

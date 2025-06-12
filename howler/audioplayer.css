@@ -1,0 +1,11 @@
+#audio_player {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    visibility: hidden;
+}
+
+#volume-slider {
+    width: 20%;
+    height: 10%;
+}
