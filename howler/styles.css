@@ -63,13 +63,15 @@ table {
     text-align: left;
     opacity: 0;
     text-shadow: none;
+    color: red;
+    font-family: monospace, monospace;
+    font-size: 0.3em;
 }
 
 .circle {
-    width: 10px;
-    height: 10px;
+
     border-radius: 50%;
-    box-shadow: 0px 0px 1px 1px #ffffff;
+    box-shadow: 0px 0px 1em 1em #ffffff;
 }
 
 .pulse {

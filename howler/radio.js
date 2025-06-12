@@ -9,7 +9,7 @@
  */
 
 // Cache references to DOM elements.
-var elms = ['title0', 'live0', 'title1', 'live1', 'title2', 'live2'];
+var elms = ['title0', 'title1', 'title2'];
 var currentNowPlayingUrl;
 var nowPlayingRequestTimer;
 var selectedChannel;
@@ -127,7 +127,13 @@ Radio.prototype = {
     toggleStationDisplay: function (index, state) {
         var self = this;
         // Show/hide the "live" marker.
-        window['live' + index].style.opacity = state ? 1 : 0;
+        if (state) {
+            window['live' + index].classList.add('.pulse');
+            window['live' + index].style.opacity = 1;
+        } else {
+            window['live' + index].classList.remove('.pulse');
+            window['live' + index].style.opacity = 0;
+        }
     }
 };
 
