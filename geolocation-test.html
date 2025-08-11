@@ -1,0 +1,38 @@
+<html>
+
+<body>
+
+    <h1>GEOLOCATION SCRIPT TEST:</h1>
+    <h2>FROM TIMEZONE:</h2>
+    <h3>free and related to client's device timezone.</h3>
+    <p id="continentFromTimezone">Not Found / Blocked by Device</p>
+    <h2>FROM IP ADDRESS:</h2>
+    <h3>limited free version (max 50k request a month), can be wrong if client under VPN, can be blocked by device security restrictions</h3>
+    <p id="ipAddress">Not Found / Blocked by Device</p>
+    <h2>SUGGESTED SERVER (based on Timezone Region):</h2>
+    <h3 id="serverEU">EU</h3>
+    <h3 id="serverNONEU">NOT-EU</h3>
+    <script>
+        var timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        var region = timezone.split("/")[0].toUpperCase();
+        var extendedTimezone = timezone + " (" + region + ")";
+        document.getElementById("continentFromTimezone").innerHTML = extendedTimezone;
+        if (region === 'EUROPE') {
+            document.getElementById("serverNONEU").style.color = "red";
+            document.getElementById("serverEU").style.color = "green";
+        } else {
+            document.getElementById("serverNONEU").style.color = "green";
+            document.getElementById("serverEU").style.color = "red";
+        }
+        fetch('https://ipinfo.io/json')
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                document.getElementById("ipAddress").innerHTML = JSON.stringify(data);
+            })
+            .catch(error => {
+                console.error('Error fetching IP:', error);
+            });
+
+    </script>
+</body>
