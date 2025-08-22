@@ -159,6 +159,7 @@ div {
     background-color: black;
     justify-content: center;
     font-family: Michroma-Regular;
+    text-align: center;
 }
 
 .links {
@@ -184,8 +185,7 @@ div {
     font-weight: bold;
     background-color: black;
     border-width: 0px;
-    max-height: 1em;
-    font-size: clamp(2rem, 2rem + 2.5vw, 3.5rem);
+    max-height: 2em;
 }
 
 .close:hover,

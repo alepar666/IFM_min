@@ -50,8 +50,6 @@ var nowPlayingMetadatas = {
     "ifmxLog": ""
 }
 
-var audio;
-
 // channel button actions
 document.getElementById("cbsChannelButton").addEventListener("click",
     function () {
@@ -73,16 +71,19 @@ document.getElementById(STOP_BUTTON_ID).addEventListener("click", function () {
 });
 
 function stopAudio() {
-    AUDIO_PLAYERS[selectedChannel].currentTime = 0;
-    AUDIO_PLAYERS[selectedChannel].pause();
+    AUDIO_CBS.pause();
+    AUDIO_DF.pause();
+    AUDIO_TDM.pause();
 }
 
 
 function playChannel(channelNumber) {
 
+    stopAudio();
+
     clearTimeout(nowPlayingRequestTimer);
     selectedChannel = channelNumber;
-    audio = AUDIO_PLAYERS[channelNumber];
+    var audio = AUDIO_PLAYERS[channelNumber];
     audio.play();
 
     try {
@@ -94,27 +95,50 @@ function playChannel(channelNumber) {
     } catch (exception) {
         console.log(exception);
     }
+    setLockscreenControls(channelNumber);
+}
+
+function setLockscreenControls(channelNumber) {
     if ("mediaSession" in navigator) {
+
         // play / pause / stop lockscreen commands
         navigator.mediaSession.setActionHandler(PLAY_ACTION_NAME, () => {
             playChannel(channelNumber);
         });
         navigator.mediaSession.setActionHandler(PAUSE_ACTION_NAME, () => {
-            audio.pause();
+            stopAudio();
         });
+
         // next track / previous track lockscreen commands
-        var previousIndex = channelNumber == 0 ? 2 : channelNumber - 1;
-        navigator.mediaSession.setActionHandler(PREVIOUS_TRACK_ACTION_NAME, () => {
-            audio.pause();
-            playChannel(previousIndex);
-        });
-        var nextIndex = channelNumber == 2 ? 0 : channelNumber + 1;
-        navigator.mediaSession.setActionHandler(NEXT_TRACK_ACTION_NAME, () => {
-            audio.pause();
-            playChannel(nextIndex);
+        var nextIndex = channelNumber + 1;
+        var previousIndex = channelNumber - 1;
+        if (channelNumber == 0) {
+            navigator.mediaSession.setActionHandler(PREVIOUS_TRACK_ACTION_NAME, null);
+            navigator.mediaSession.setActionHandler(NEXT_TRACK_ACTION_NAME, () => {
+                playChannel(nextIndex);
+            });
+        } else
+        if (channelNumber == 1) {
+            navigator.mediaSession.setActionHandler(PREVIOUS_TRACK_ACTION_NAME, () => {
+                playChannel(previousIndex);
+            });
+            navigator.mediaSession.setActionHandler(NEXT_TRACK_ACTION_NAME, () => {
+                playChannel(nextIndex);
+            });
+        } else
+        if (channelNumber == 2) {
+            navigator.mediaSession.setActionHandler(NEXT_TRACK_ACTION_NAME, null);
+            navigator.mediaSession.setActionHandler(PREVIOUS_TRACK_ACTION_NAME, () => {
+                playChannel(previousIndex);
+            });
+        }
+        // coming back from lockscreen action 
+        document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") {
+                // no action  
+            }
         });
     }
-
 }
 
 // request now playing from IFM server every NOW_PLAYING_REQUEST_TIMEOUT_MSEC
