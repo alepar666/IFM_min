@@ -27,11 +27,6 @@ const TDM_COVER_PATH = "img/tdm128.png";
 const COVER_PATH_ARRAY = [CBS_COVER_PATH, DF_COVER_PATH, TDM_COVER_PATH];
 const ARTIST_TITLE_SPLIT_STRING = ' - ';
 const METADATA_SPLIT_CHAR = '|';
-const NEXT_TRACK_ACTION_NAME = 'nexttrack';
-const PREVIOUS_TRACK_ACTION_NAME = 'previoustrack';
-const PLAY_ACTION_NAME = 'play';
-const PAUSE_ACTION_NAME = 'pause';
-const STOP_ACTION_NAME = 'stop';
 const AUDIO_CONTROLS_KEY = 'controls';
 const AUDIO_EVENT_PLAYING_NAME = 'playing';
 const AUDIO_EVENT_PAUSE_NAME = 'pause';
@@ -40,6 +35,13 @@ const AUDIO_PLAYER_SOURCE_ID = 'audioPlayerSource';
 const LOADING_MSG = 'Loading ';
 var previousTrackTitle = EMPTY_VAL;
 var previousExtractedCoverHTML = EMPTY_VAL;
+const NEXT_TRACK_ACTION_NAME = 'nexttrack';
+const PREVIOUS_TRACK_ACTION_NAME = 'previoustrack';
+const PLAY_ACTION_NAME = 'play';
+const PAUSE_ACTION_NAME = 'pause';
+const STOP_ACTION_NAME = 'stop';
+const SEEK_FORWARD_ACTION_NAME = 'seekforward';
+const SEEK_BACKWARD_ACTION_NAME = 'seekbackward';
 var nowPlayingMetadatas = {
     "artist": "",
     "title": "",
@@ -66,79 +68,85 @@ document.getElementById("tdmChannelButton").addEventListener("click",
 
 // stop button
 document.getElementById(STOP_BUTTON_ID).addEventListener("click", function () {
-    stopAudio();
+    /*
+    stopChannel(0);
+    stopChannel(1);
+    stopChannel(2);
+    */
+    stop();
     reset();
 });
 
-function stopAudio() {
-    AUDIO_CBS.pause();
-    AUDIO_DF.pause();
-    AUDIO_TDM.pause();
+/*
+function stopChannel(channelNumber) {
+    AUDIO_PLAYERS[channelNumber].src = '';
 }
 
+function stopOtherChannels(excludedChannel) {
+    for (var i = 0; i < AUDIO_PLAYERS.length; i++) {
+        if (i != excludedChannel) {
+            stopChannel(i);
+        }
+    }
+}
+*/
+
+function stop() {
+    AUDIO_PLAYER.src = '';
+}
 
 function playChannel(channelNumber) {
-
-    stopAudio();
-
-    clearTimeout(nowPlayingRequestTimer);
     selectedChannel = channelNumber;
-    var audio = AUDIO_PLAYERS[channelNumber];
-    audio.play();
+    AUDIO_PLAYER.src = fetchedStations[channelNumber].src;
+    AUDIO_PLAYER.load();
 
-    try {
-        previousExtractedCoverHTML = EMPTY_VAL;
-        var channelTitle = fetchedStations[channelNumber].title;
-        displayMessage(LOADING_MSG + channelTitle + "...");
-        currentNowPlayingUrl = NOW_PLAYING_REQUEST_PREFIX + channelTitle;
-        getNowPlaying();
-    } catch (exception) {
-        console.log(exception);
+    /*
+    if (navigator.mediaSession.playbackState = 'playing') {
+        //stopOtherChannels(channelNumber);
+        stop();
     }
-    setLockscreenControls(channelNumber);
+    /*
+    const audioPlayer = AUDIO_PLAYERS[channelNumber];
+    if (audioPlayer.src) {
+        audioPlayer.src = fetchedStations[channelNumber].src;
+        audioPlayer.load();
+    }
+    */
+
+    audioContext.resume().then(() => {
+        AUDIO_PLAYER.play();
+        getNowPlaying();
+    });
+
+    setLockscreenTrackCommands();
+    addAudioEventListeners(AUDIO_PLAYER);
+    clearTimeout(nowPlayingRequestTimer);
+    previousExtractedCoverHTML = EMPTY_VAL;
+
+    var channelTitle = fetchedStations[channelNumber].title;
+    displayMessage(LOADING_MSG + channelTitle + "...");
+    currentNowPlayingUrl = NOW_PLAYING_REQUEST_PREFIX + channelTitle;
+
 }
 
-function setLockscreenControls(channelNumber) {
-    if ("mediaSession" in navigator) {
+function addAudioEventListeners(audioPlayer) {
 
-        // play / pause / stop lockscreen commands
-        navigator.mediaSession.setActionHandler(PLAY_ACTION_NAME, () => {
-            playChannel(channelNumber);
-        });
-        navigator.mediaSession.setActionHandler(PAUSE_ACTION_NAME, () => {
-            stopAudio();
-        });
+    audioPlayer.addEventListener(PLAY_ACTION_NAME, () => {
+        navigator.mediaSession.playbackState = 'playing';
+    });
 
-        // next track / previous track lockscreen commands
-        var nextIndex = channelNumber + 1;
-        var previousIndex = channelNumber - 1;
-        if (channelNumber == 0) {
-            navigator.mediaSession.setActionHandler(PREVIOUS_TRACK_ACTION_NAME, null);
-            navigator.mediaSession.setActionHandler(NEXT_TRACK_ACTION_NAME, () => {
-                playChannel(nextIndex);
-            });
-        } else
-        if (channelNumber == 1) {
-            navigator.mediaSession.setActionHandler(PREVIOUS_TRACK_ACTION_NAME, () => {
-                playChannel(previousIndex);
-            });
-            navigator.mediaSession.setActionHandler(NEXT_TRACK_ACTION_NAME, () => {
-                playChannel(nextIndex);
-            });
-        } else
-        if (channelNumber == 2) {
-            navigator.mediaSession.setActionHandler(NEXT_TRACK_ACTION_NAME, null);
-            navigator.mediaSession.setActionHandler(PREVIOUS_TRACK_ACTION_NAME, () => {
-                playChannel(previousIndex);
-            });
-        }
-        // coming back from lockscreen action 
-        document.addEventListener("visibilitychange", () => {
-            if (document.visibilityState === "visible") {
-                // no action  
+    audioPlayer.addEventListener(PAUSE_ACTION_NAME, () => {
+        navigator.mediaSession.playbackState = 'paused';
+    });
+
+    // coming back from lockscreen action 
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+            if (navigator.mediaSession.playbackState == "playing") {
+                // do nothing for god sake
             }
-        });
-    }
+        }
+    });
 }
 
 // request now playing from IFM server every NOW_PLAYING_REQUEST_TIMEOUT_MSEC
@@ -207,6 +215,38 @@ function setTrackMetadata(trackMetadata) {
     }
 }
 
+function setLockscreenTrackCommands() {
+    if ("mediaSession" in navigator) {
+        navigator.mediaSession.setActionHandler(SEEK_BACKWARD_ACTION_NAME, null);
+        navigator.mediaSession.setActionHandler(SEEK_FORWARD_ACTION_NAME, null);
+
+        /* TO BE TESTED BETTER */
+        var previousIndex = selectedChannel == 0 ? 2 : (selectedChannel - 1);
+        var nextIndex = selectedChannel == 2 ? 0 : (selectedChannel + 1);
+
+        if (selectedChannel == 0) {
+            navigator.mediaSession.setActionHandler(PREVIOUS_TRACK_ACTION_NAME, null);
+            navigator.mediaSession.setActionHandler(NEXT_TRACK_ACTION_NAME, () => {
+                playChannel(nextIndex);
+            });
+        } else
+        if (selectedChannel == 1) {
+            navigator.mediaSession.setActionHandler(PREVIOUS_TRACK_ACTION_NAME, () => {
+                playChannel(previousIndex);
+            });
+            navigator.mediaSession.setActionHandler(NEXT_TRACK_ACTION_NAME, () => {
+                playChannel(nextIndex);
+            });
+        } else
+        if (selectedChannel == 2) {
+            navigator.mediaSession.setActionHandler(NEXT_TRACK_ACTION_NAME, null);
+            navigator.mediaSession.setActionHandler(PREVIOUS_TRACK_ACTION_NAME, () => {
+                playChannel(previousIndex);
+            });
+        }
+    }
+}
+
 // populate the now playing html
 function feedNowPlaying(title) {
 
@@ -250,9 +290,8 @@ async function extractCoverFromChannelContent(attempt) {
     if (extractedCoverHTML != previousExtractedCoverHTML) {
         //console.log("NEW ARTWORK!");
         previousExtractedCoverHTML = extractedCoverHTML;
-
         // clean IFM inherited website styling and replace blanco img on error with local one
-        var extractedCleanCoverHTML = extractedCoverHTML.replace('class="mr-3 air-time-image"', '').replace('https://www.intergalactic.fm/sites/default/files/covers/blanco.png', 'img/blanco.png').replace('onerror=null;', '').replace('style="object-fit: scale-down"', '').replace('width="100"', 'width="100%"').replace('height="100"', 'height="100%"');
+        var extractedCleanCoverHTML = extractedCoverHTML.replace('class="mr-3 air-time-image"', '').replace('https://www.intergalactic.fm/sites/default/files/covers/blanco.png', 'img/blanco.png').replace('this.onerror=null;', '').replace('style="object-fit: scale-down"', '').replace('width="100"', 'width="90%"').replace('height="100"', 'height="90%"');
         feedHTML(NOW_PLAYING_COVER_DIV_ID, extractedCleanCoverHTML);
     } else {
         //console.log("STILL OLD ARTWORK!");
